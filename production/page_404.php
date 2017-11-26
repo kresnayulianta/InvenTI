@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Gentelella Alela! | </title>
+    <title>Inventaris HIMTI</title>
 
     <!-- Bootstrap -->
     <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -17,7 +17,7 @@
     <link href="../vendors/nprogress/nprogress.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
-    <link href="../build/css/custom.min.css" rel="stylesheet">
+    <link href="css/custom.min.css" rel="stylesheet">
   </head>
 
   <body class="nav-md">
@@ -29,20 +29,6 @@
             <div class="text-center text-center">
               <h1 class="error-number">404</h1>
               <h2>Sorry but we couldn't find this page</h2>
-              <p>This page you are looking for does not exist <a href="#">Report this?</a>
-              </p>
-              <div class="mid_center">
-                <h3>Search</h3>
-                <form>
-                  <div class="col-xs-12 form-group pull-right top_search">
-                    <div class="input-group">
-                      <input type="text" class="form-control" placeholder="Search for...">
-                      <span class="input-group-btn">
-                              <button class="btn btn-default" type="button">Go!</button>
-                          </span>
-                    </div>
-                  </div>
-                </form>
               </div>
             </div>
           </div>
@@ -61,6 +47,6 @@
     <script src="../vendors/nprogress/nprogress.js"></script>
 
     <!-- Custom Theme Scripts -->
-    <script src="../build/js/custom.min.js"></script>
+    <script src="../js/custom.min.js"></script>
   </body>
 </html>

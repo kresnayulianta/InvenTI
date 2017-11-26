@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 24 Nov 2017 pada 23.45
+-- Generation Time: 26 Nov 2017 pada 10.32
 -- Versi Server: 10.1.26-MariaDB
 -- PHP Version: 7.1.9
 
@@ -107,19 +107,21 @@ CREATE TABLE `tb_user` (
   `password` varchar(50) NOT NULL,
   `nim` varchar(11) NOT NULL,
   `notelp` varchar(15) NOT NULL,
-  `hakakses` varchar(20) NOT NULL
+  `hakakses` varchar(20) NOT NULL,
+  `konfirmasi` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `tb_user`
 --
 
-INSERT INTO `tb_user` (`id`, `firstname`, `lastname`, `username`, `password`, `nim`, `notelp`, `hakakses`) VALUES
-(1, 'Kresna', 'Yulianta', 'admin', '21232f297a57a5a743894a0e4a801fc3', '15050974030', '085749066789', 'Administrator'),
-(2, 'iop', 'iop', 'iop', '9fbfb220e03aa76d424088e43314b0d0', 'iop', 'iop', 'Peminjam'),
-(3, 'Abhimata', 'Pramudita', 'kahima', 'ac34bc00bd05fed0b4091779b664fbb6', '15', '12', 'Kahima'),
-(4, 'Rizky', 'Rizaldy', 'admin2', 'c84258e9c39059a89ab77d846ddab909', '15050974022', '085', 'Administrator'),
-(5, 'agustin', 'fatimah', 'user', 'ee11cbb19052e40b07aac0ca060c23ee', '15050974012', '085', 'Peminjam');
+INSERT INTO `tb_user` (`id`, `firstname`, `lastname`, `username`, `password`, `nim`, `notelp`, `hakakses`, `konfirmasi`) VALUES
+(1, 'Kresna', 'Yulianta', 'admin', '21232f297a57a5a743894a0e4a801fc3', '15050974030', '085749066789', 'Administrator', 1),
+(2, 'iop', 'iop', 'iop', '9fbfb220e03aa76d424088e43314b0d0', 'iop', 'iop', 'Peminjam', 0),
+(3, 'Abhimata', 'Pramudita', 'kahima', 'ac34bc00bd05fed0b4091779b664fbb6', '15', '12', 'Kahima', 1),
+(4, 'Rizky', 'Rizaldy', 'admin2', 'c84258e9c39059a89ab77d846ddab909', '15050974022', '085', 'Administrator', 1),
+(5, 'agustin', 'fatimah', 'user', 'ee11cbb19052e40b07aac0ca060c23ee', '15050974012', '085', 'Peminjam', 1),
+(7, 'we', 'we', 'we', 'ff1ccf57e98c817df1efcd9fe44a8aeb', 'we', 'we', 'Peminjam', 0);
 
 --
 -- Indexes for dumped tables
@@ -175,7 +177,7 @@ ALTER TABLE `tb_peminjaman`
 -- AUTO_INCREMENT for table `tb_user`
 --
 ALTER TABLE `tb_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

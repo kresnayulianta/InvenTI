@@ -61,7 +61,7 @@
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="index_admin.html" class="site_title"><i class="fa fa-paw"></i> <span>Inventaris HIMTI</span></a>
+              <a href="index_admin.php" class="site_title"><i class="fa fa-paw"></i> <span>Inventaris HIMTI</span></a>
             </div>
 
             <div class="clearfix"></div>
@@ -84,49 +84,55 @@
   
               <!-- sidebar menu -->
               <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-                <div class="menu_section">
-                  <h3>Menu</h3>
-                  <ul class="nav side-menu">
-                    <li>
-                      <a href="index_admin.php">
-                        <i class="fa fa-home"></i>
-                        Home
-                      </a>
-                    </li>
-                    <li>
-                      <a href="data_barang_admin.php">
-                        <i class="fa fa-shopping-basket"></i>
-                        Data Barang
-                      </a>
-                    </li>
-                    <li>
-                      <a href="data_user_admin.php">
-                        <i class="fa fa-user"></i>
-                        Data User
-                      </a>
-                    </li>
-                    <li>
-                      <a href="form_registrasiuser.php">
-                        <i class="fa fa-pencil"></i>
-                          Form Registrasi User
-                      </a>
-                    </li>
-                    <li>
-                      <a href="form_tambahbarang.php">
-                        <i class="fa fa-pencil"></i>
-                          Form Tambah Barang
-                      </a>
-                    </li>
-                    <li>
-                      <a href="form_pengembalian.php">
-                        <i class="fa fa-pencil"></i>
-                        Form Pengembalian
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+              <div class="menu_section">
+                <h3>Menu</h3>
+                <ul class="nav side-menu">
+                  <li>
+                    <a href="index_admin.php">
+                      <i class="fa fa-home"></i>
+                      Home
+                    </a>
+                  </li>
+                  <li>
+                    <a href="data_barang_admin.php">
+                      <i class="fa fa-shopping-basket"></i>
+                      Data Barang
+                    </a>
+                  </li>
+                  <li>
+                    <a href="data_pengembalian_admin.php">
+                      <i class="fa fa-table"></i>
+                      Data Pengembalian
+                    </a>
+                  </li>
+                  <li>
+                    <a href="data_user_admin.php">
+                      <i class="fa fa-user"></i>
+                      Data User
+                    </a>
+                  </li>
+                  <li>
+                    <a href="form_registrasiuser.php">
+                      <i class="fa fa-pencil"></i>
+                        Form Registrasi User
+                    </a>
+                  </li>
+                  <li>
+                    <a href="form_tambahbarang.php">
+                      <i class="fa fa-pencil"></i>
+                        Form Tambah Barang
+                    </a>
+                  </li>
+                  <li>
+                    <a href="form_pengembalian.php">
+                      <i class="fa fa-pencil"></i>
+                      Form Pengembalian
+                    </a>
+                  </li>
+                </ul>
               </div>
-              <!-- /sidebar menu -->
+            </div>
+            <!-- /sidebar menu -->
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
@@ -139,7 +145,7 @@
               <a data-toggle="tooltip" data-placement="top" title="Lock">
                 <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
               </a>
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
               </a>
             </div>

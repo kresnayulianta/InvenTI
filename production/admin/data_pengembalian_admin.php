@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <?php
+  date_default_timezone_set('Asia/Jakarta');
   session_start();
   error_reporting(0);
   if (empty($_SESSION['login']['hakakses'])) {
@@ -8,7 +9,8 @@
         'Anda Belum Login!'
         window.location='../';
       </script>";
-  }else if($_SESSION['login']['hakakses'] != "Kahima"){
+  }
+  else if($_SESSION['login']['hakakses'] != "Administrator"){
     header("Location: ../db/auth.php");
   }
 ?>
@@ -20,7 +22,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Laporan Peminjam Barang</title>
+    <title>Data Barang</title>
 
     <!-- Bootstrap -->
     <link href="../../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -38,28 +40,28 @@
     <link href="../../vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
-    <link href="../css/custom.min.css" rel="stylesheet">
+    <link href="../../production/css/custom.min.css" rel="stylesheet">
   </head>
 
   <body class="nav-md">
     <?php
       include '../db/koneksi.php';
       $username = $_SESSION['login']['username'];
-      $queryindex = mysqli_query($conn, "SELECT firstname,lastname,nim FROM tb_user Where username='$username'");
-      $data = mysqli_fetch_array($queryindex);
+      $querydatauser = mysqli_query($conn, "SELECT firstname,lastname,nim FROM tb_user Where username='$username'");
+      $data = mysqli_fetch_array($querydatauser);
       $_SESSION['login']['firstname'] = $data['firstname'];
       $_SESSION['login']['lastname']  = $data['lastname'];
       $_SESSION['login']['nim']       = $data['nim'];
       $fname = $_SESSION['login']['firstname'];
       $lname = $_SESSION['login']['lastname'];
-      $nim   = $_SESSION['login']['nim'];
+      $nim   = $_SESSION['login']['nim']
     ?>
     <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="index_kahima.php" class="site_title"><i class="fa fa-paw"></i> <span>Inventaris HIMTI</span></a>
+              <a href="index_admin.php" class="site_title"><i class="fa fa-paw"></i> <span>Inventaris HIMTI</span></a>
             </div>
 
             <div class="clearfix"></div>
@@ -72,8 +74,8 @@
                 <div class="profile_info">
                   <span>Welcome,</span>
                   <h2><?php
-                    echo "$fname"." "."$lname";
-                  ?></h2>
+                      echo "$fname"." "."$lname";
+                    ?></h2>
                 </div>
               </div>
               <!-- /menu profile quick info -->
@@ -86,33 +88,45 @@
                   <h3>Menu</h3>
                   <ul class="nav side-menu">
                     <li>
-                      <a href="index_kahima.php">
+                      <a href="index_admin.php">
                         <i class="fa fa-home"></i>
                         Home
                       </a>
                     </li>
                     <li>
-                      <a href="laporan_barang.php">
+                      <a href="data_barang_admin.php">
                         <i class="fa fa-shopping-basket"></i>
-                        Laporan Barang
+                        Data Barang
                       </a>
                     </li>
                     <li>
-                      <a href="laporan_peminjam.php">
+                      <a href="data_pengembalian_admin.php">
                         <i class="fa fa-table"></i>
-                        Laporan Peminjam
+                        Data Pengembalian
                       </a>
                     </li>
                     <li>
-                      <a href="laporan_pengembalian.php">
-                        <i class="fa fa-table"></i>
-                          Laporan Pengembalian
-                      </a>
-                    </li>
-                    <li>
-                      <a href="laporan_user.php">
+                      <a href="data_user_admin.php">
                         <i class="fa fa-user"></i>
-                          Laporan User
+                        Data User
+                      </a>
+                    </li>
+                    <li>
+                      <a href="form_registrasiuser.php">
+                        <i class="fa fa-pencil"></i>
+                          Form Registrasi User
+                      </a>
+                    </li>
+                    <li>
+                      <a href="form_tambahbarang.php">
+                        <i class="fa fa-pencil"></i>
+                          Form Tambah Barang
+                      </a>
+                    </li>
+                    <li>
+                      <a href="form_pengembalian.php">
+                        <i class="fa fa-pencil"></i>
+                        Form Pengembalian
                       </a>
                     </li>
                   </ul>
@@ -131,7 +145,7 @@
               <a data-toggle="tooltip" data-placement="top" title="Lock">
                 <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
               </a>
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logut.php">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
               </a>
             </div>
@@ -151,8 +165,8 @@
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     <img src="../images/img.jpg" alt=""><?php
-                    echo "$fname"." "."$lname";
-                  ?>
+                      echo "$fname"." "."$lname";
+                    ?>
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -176,41 +190,39 @@
         <!-- page content -->
         <div class="right_col" role="main">
           <div class="">
+            <div class="clearfix"></div>
             <div class="row">
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                   <div class="x_title">
-                    <h2>Laporan Data Peminjam</h2>
+                    <h2>Data Pengembalian</h2>
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
-                    <p class="text-muted font-13 m-b-30">
-                     Data Peminjam Barang Inventaris HIMTI Unesa 
-                    </p>
                     <table id="datatable-buttons" class="table table-striped table-bordered">
                       <thead>
                         <tr>
                           <th>NO</th>
-                          <th>Kode Peminjaman</th>
+                          <th>Kode Pinjam</th>
                           <th>Kode Barang</th>
                           <th>Nama Barang</th>
-                          <th>Tanggal Pinjam</th>
+                          <th>Username</th>
+                          <th>Tanggal Pinjam</th>                  
                           <th>Tanggal Kembali</th>
+                          <th>Konfirmasi</th>
                         </tr>
                       </thead>
                       <tbody>
-                      <?php
+                        <?php
                           include '../db/koneksi.php';
-                          $count      = 1;
-                          $querytable = mysqli_query($conn, "SELECT kodepinjam,kodebarangpinjam,tglpinjam,tglkembali FROM tb_peminjaman");
-                          
-                          while($row = mysqli_fetch_assoc($querytable)){
-                        ?>
-                              <tr>
-                                <td><?php echo $count; ?></td>
-                                <td><?php echo $row['kodepinjam']; ?></td>
-                                <td><?php echo $row['kodebarangpinjam']; ?></td>
-                                <td>
+                          $count=1;
+                          $querytable = mysqli_query($conn, "SELECT kodepinjam,kodebarangpinjam,namauserpinjam,tglpinjam,tglkembali,konfirmasi FROM tb_peminjaman");
+                          while($row = mysqli_fetch_assoc($querytable)){ ?>
+                            <tr>
+                              <td><?php echo $count; ?></td>
+                              <td><?php echo $row['kodepinjam']; ?></td>
+                              <td><?php echo $row['kodebarangpinjam']; ?></td>
+                              <td>
                                   <?php
                                     $kodebpinjam = $row['kodebarangpinjam'];
                                     $querynamab = mysqli_query($conn, "SELECT namab FROM tb_barang WHERE kodeb='$kodebpinjam'");
@@ -218,21 +230,32 @@
                                     $namab      = $datan['namab'];
                                     echo "$namab";
                                   ?>
-                                </td> 
-                                <td><?php echo $row['tglpinjam']; ?></td>
-                                <td><?php echo $row['tglkembali']; ?></td>      
-                              </tr>
-                        <?php 
-                              $count++; 
-                            }
-                        ?>
+                              </td>
+                              <td><?php echo $row['namauserpinjam']; ?></td>
+                              <td><?php echo $row['tglpinjam']; ?></td>
+                              <td><?php echo $row['tglkembali']; ?></td>
+                              <td>
+                                <?php
+                                if($row['konfirmasi']==0){
+                                    ?>
+                                    <button type="button" class="btn btn-danger btn-xs">Belum konfirmasi</button>
+                                    <?php
+                                }else{
+                                    ?>
+                                    <button type="button" class="btn btn-success btn-xs">Terkonfirmasi</button>
+                                    <?php
+                                }
+                                ?>
+                            </td>
+                            </tr>
+                        <?php $count++; } ?>
                       </tbody>
                     </table>
                   </div>
                 </div>
               </div>
-            </div>  
-          </div>   
+            </div>
+          </div>
         </div>
         <!-- /page content -->
 
@@ -275,7 +298,7 @@
     <script src="../../vendors/pdfmake/build/vfs_fonts.js"></script>
 
     <!-- Custom Theme Scripts -->
-    <script src="../js/custom.min.js"></script>
+    <script src="../../production/js/custom.min.js"></script>
 
   </body>
 </html>

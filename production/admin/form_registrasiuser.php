@@ -89,49 +89,55 @@
   
               <!-- sidebar menu -->
               <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-                <div class="menu_section">
-                  <h3>Menu</h3>
-                  <ul class="nav side-menu">
-                    <li>
-                      <a href="index_admin.php">
-                        <i class="fa fa-home"></i>
-                        Home
-                      </a>
-                    </li>
-                    <li>
-                      <a href="data_barang_admin.php">
-                        <i class="fa fa-shopping-basket"></i>
-                        Data Barang
-                      </a>
-                    </li>
-                    <li>
-                      <a href="data_user_admin.php">
-                        <i class="fa fa-user"></i>
-                        Data User
-                      </a>
-                    </li>
-                    <li>
-                      <a href="form_registrasiuser.php">
-                        <i class="fa fa-pencil"></i>
-                          Form Registrasi User
-                      </a>
-                    </li>
-                    <li>
-                      <a href="form_tambahbarang.php">
-                        <i class="fa fa-pencil"></i>
-                          Form Tambah Barang
-                      </a>
-                    </li>
-                    <li>
-                      <a href="form_pengembalian.php">
-                        <i class="fa fa-pencil"></i>
-                        Form Pengembalian
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+              <div class="menu_section">
+                <h3>Menu</h3>
+                <ul class="nav side-menu">
+                  <li>
+                    <a href="index_admin.php">
+                      <i class="fa fa-home"></i>
+                      Home
+                    </a>
+                  </li>
+                  <li>
+                    <a href="data_barang_admin.php">
+                      <i class="fa fa-shopping-basket"></i>
+                      Data Barang
+                    </a>
+                  </li>
+                  <li>
+                    <a href="data_pengembalian_admin.php">
+                      <i class="fa fa-table"></i>
+                      Data Pengembalian
+                    </a>
+                  </li>
+                  <li>
+                    <a href="data_user_admin.php">
+                      <i class="fa fa-user"></i>
+                      Data User
+                    </a>
+                  </li>
+                  <li>
+                    <a href="form_registrasiuser.php">
+                      <i class="fa fa-pencil"></i>
+                        Form Registrasi User
+                    </a>
+                  </li>
+                  <li>
+                    <a href="form_tambahbarang.php">
+                      <i class="fa fa-pencil"></i>
+                        Form Tambah Barang
+                    </a>
+                  </li>
+                  <li>
+                    <a href="form_pengembalian.php">
+                      <i class="fa fa-pencil"></i>
+                      Form Pengembalian
+                    </a>
+                  </li>
+                </ul>
               </div>
-              <!-- /sidebar menu -->
+            </div>
+            <!-- /sidebar menu -->
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
@@ -144,7 +150,7 @@
               <a data-toggle="tooltip" data-placement="top" title="Lock">
                 <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
               </a>
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
               </a>
             </div>
@@ -177,7 +183,7 @@
                       </a>
                     </li>
                     <li><a href="javascript:;">Help</a></li>
-                    <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                    <li><a href="../db/logout.php"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                   </ul>
                 </li>
               </ul>
@@ -199,19 +205,25 @@
               $nim        = $conn -> real_escape_string($_POST['nim']);
               $notelp     = $conn -> real_escape_string($_POST['notelp']);
               $hakakses   = $conn -> real_escape_string($_POST['hakakses']);
-                
+              $konfirmasi = $conn -> real_escape_string("1");
+              
+              $firstname  = strtolower($firstname);
+              $firstname  = ucwords($firstname);
+              $lastname   = strtolower($lastname);
+              $lastname   = ucwords($lastname);
+              
               //check username has been taken or not
               $sql = "SELECT username FROM tb_user WHERE username='$username'";
               $result = mysqli_query($conn,$sql);
               $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
                 
               if(mysqli_num_rows($result) == 1){
-                echo "Sorry...This username already exist..";
+                echo "<script> alert('Maaf Username telah terpakai, Coba ganti yang lain. Terima Kasih.')</script>";
               }
               else{
-                $query = mysqli_query($conn, "INSERT INTO tb_user(id, firstname, lastname, username, password, nim, notelp, hakakses) VALUES (null,'$firstname','$lastname','$username','$password','$nim','$notelp','$hakakses')");
+                $query = mysqli_query($conn, "INSERT INTO tb_user(id, firstname, lastname, username, password, nim, notelp, hakakses,konfirmasi) VALUES (null,'$firstname','$lastname','$username','$password','$nim','$notelp','$hakakses','$konfirmasi')");
                 if($query){
-                  echo "Thank You! you are now registered.";
+                  echo "<script> alert('Username telah terdaftar. Terima Kasih.')</script>";
                 }
               }
             } 
@@ -341,6 +353,6 @@
     <script src="../../vendors/starrr/dist/starrr.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="../../production/js/custom.min.js"></script>
-	
+    
   </body>
 </html>

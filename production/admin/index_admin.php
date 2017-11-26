@@ -42,19 +42,9 @@
 
     <!-- Custom Theme Style -->
     <link href="../../production/css/custom.min.css" rel="stylesheet">
-
-    <script type="text/javascript">        
-      function tampilkanwaktu(){         //fungsi ini akan dipanggil di bodyOnLoad dieksekusi tiap 1000ms = 1detik    
-        var waktu = new Date();            //membuat object date berdasarkan waktu saat 
-        var sh = waktu.getHours() + "";    //memunculkan nilai jam, //tambahan script + "" supaya variable sh bertipe string sehingga bisa dihitung panjangnya : sh.length    //ambil nilai menit
-        var sm = waktu.getMinutes() + "";  //memunculkan nilai detik    
-        var ss = waktu.getSeconds() + "";  //memunculkan jam:menit:detik dengan menambahkan angka 0 jika angkanya cuma satu digit (0-9)
-        document.getElementById("clock").innerHTML = (sh.length==1?"0"+sh:sh) + ":" + (sm.length==1?"0"+sm:sm) + ":" + (ss.length==1?"0"+ss:ss);
-      }
-    </script>
   </head>
 
-  <body class="nav-md" onload="tampilkanwaktu();setInterval('tampilkanwaktu()', 1000);">
+  <body class="nav-md">
     <?php
       include '../db/koneksi.php';
       $username = $_SESSION['login']['username'];
@@ -104,49 +94,55 @@
 
             <!-- sidebar menu -->
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-              <div class="menu_section">
-                <h3>Menu</h3>
-                <ul class="nav side-menu">
-                  <li>
-                    <a href="index_admin.php">
-                      <i class="fa fa-home"></i>
-                      Home
-                    </a>
-                  </li>
-                  <li>
-                    <a href="data_barang_admin.php">
-                      <i class="fa fa-shopping-basket"></i>
-                      Data Barang
-                    </a>
-                  </li>
-                  <li>
-                    <a href="data_user_admin.php">
-                      <i class="fa fa-user"></i>
-                      Data User
-                    </a>
-                  </li>
-                  <li>
-                    <a href="form_registrasiuser.php">
-                      <i class="fa fa-pencil"></i>
-                        Form Registrasi User
-                    </a>
-                  </li>
-                  <li>
-                    <a href="form_tambahbarang.php">
-                      <i class="fa fa-pencil"></i>
-                        Form Tambah Barang
-                    </a>
-                  </li>
-                  <li>
-                    <a href="form_pengembalian.php">
-                      <i class="fa fa-pencil"></i>
-                        Form Pengembalian
-                    </a>
-                  </li>
-                </ul>
-              </div>
+            <div class="menu_section">
+              <h3>Menu</h3>
+              <ul class="nav side-menu">
+                <li>
+                  <a href="index_admin.php">
+                    <i class="fa fa-home"></i>
+                    Home
+                  </a>
+                </li>
+                <li>
+                  <a href="data_barang_admin.php">
+                    <i class="fa fa-shopping-basket"></i>
+                    Data Barang
+                  </a>
+                </li>
+                <li>
+                  <a href="data_pengembalian_admin.php">
+                    <i class="fa fa-table"></i>
+                    Data Pengembalian
+                  </a>
+                </li>
+                <li>
+                  <a href="data_user_admin.php">
+                    <i class="fa fa-user"></i>
+                    Data User
+                  </a>
+                </li>
+                <li>
+                  <a href="form_registrasiuser.php">
+                    <i class="fa fa-pencil"></i>
+                      Form Registrasi User
+                  </a>
+                </li>
+                <li>
+                  <a href="form_tambahbarang.php">
+                    <i class="fa fa-pencil"></i>
+                      Form Tambah Barang
+                  </a>
+                </li>
+                <li>
+                  <a href="form_pengembalian.php">
+                    <i class="fa fa-pencil"></i>
+                    Form Pengembalian
+                  </a>
+                </li>
+              </ul>
             </div>
-            <!-- /sidebar menu -->
+          </div>
+          <!-- /sidebar menu -->
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
@@ -159,7 +155,7 @@
               <a data-toggle="tooltip" data-placement="top" title="Lock">
                 <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
               </a>
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
               </a>
             </div>
@@ -195,60 +191,6 @@
                     <li><a href="javascript:;">Help</a></li>
                     <li><a href="../db/logout.php"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                   </ul>
-                </li>
-                <li class="middle" style="">
-                  <?php
-                    $hari = date('l');
-                      if ($hari=="Sunday") {
-                      echo "Minggu";
-                      }elseif ($hari=="Monday") {
-                      echo "Senin";
-                      }elseif ($hari=="Tuesday") {
-                      echo "Selasa";
-                      }elseif ($hari=="Wednesday") {
-                      echo "Rabu";
-                      }elseif ($hari=="Thursday") {
-                      echo("Kamis");
-                      }elseif ($hari=="Friday") {
-                      echo "Jum'at";
-                      }elseif ($hari=="Saturday") {
-                      echo "Sabtu";
-                      }
-                  ?>,
-                    
-                  <?php
-                    $tgl =date('d');
-                    echo $tgl;
-                    $bulan =date('F');
-                    if ($bulan=="January") {
-                     echo " Januari ";
-                    }elseif ($bulan=="February") {
-                     echo " Februari ";
-                    }elseif ($bulan=="March") {
-                     echo " Maret ";
-                    }elseif ($bulan=="April") {
-                     echo " April ";
-                    }elseif ($bulan=="May") {
-                     echo " Mei ";
-                    }elseif ($bulan=="June") {
-                     echo " Juni ";
-                    }elseif ($bulan=="July") {
-                     echo " Juli ";
-                    }elseif ($bulan=="August") {
-                     echo " Agustus ";
-                    }elseif ($bulan=="September") {
-                     echo " September ";
-                    }elseif ($bulan=="October") {
-                     echo " Oktober ";
-                    }elseif ($bulan=="November") {
-                     echo " November ";
-                    }elseif ($bulan=="December") {
-                     echo " Desember ";
-                    }
-                    $tahun=date('Y');
-                    echo $tahun;
-                  ?>
-                    <span id="clock"></span>
                 </li>
               </ul>
             </nav>
@@ -353,14 +295,5 @@
 
     <!-- Custom Theme Scripts -->
     <script src="../../production/js/custom.min.js"></script>
-
-    <style>
-      li.middle {
-        padding-top:20px;
-        float:left;
-        margin:0;
-        width:207px;
-      }
-    </style>
   </body>
 </html>

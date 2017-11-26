@@ -44,6 +44,7 @@
 
     <!-- Custom Theme Style -->
     <link href="../../production/css/custom.min.css" rel="stylesheet">
+
   </head>
 
   <body class="nav-md">
@@ -87,49 +88,55 @@
   
               <!-- sidebar menu -->
               <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-                <div class="menu_section">
-                  <h3>Menu</h3>
-                  <ul class="nav side-menu">
-                    <li>
-                      <a href="index_admin.php">
-                        <i class="fa fa-home"></i>
-                        Home
-                      </a>
-                    </li>
-                    <li>
-                      <a href="data_barang_admin.php">
-                        <i class="fa fa-shopping-basket"></i>
-                        Data Barang
-                      </a>
-                    </li>
-                    <li>
-                      <a href="data_user_admin.php">
-                        <i class="fa fa-user"></i>
-                        Data User
-                      </a>
-                    </li>
-                    <li>
-                      <a href="form_registrasiuser.php">
-                        <i class="fa fa-pencil"></i>
-                          Form Registrasi User
-                      </a>
-                    </li>
-                    <li>
-                      <a href="form_tambahbarang.php">
-                        <i class="fa fa-pencil"></i>
-                          Form Tambah Barang
-                      </a>
-                    </li>
-                    <li>
-                      <a href="form_pengembalian.php">
-                        <i class="fa fa-pencil"></i>
-                        Form Pengembalian
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+              <div class="menu_section">
+                <h3>Menu</h3>
+                <ul class="nav side-menu">
+                  <li>
+                    <a href="index_admin.php">
+                      <i class="fa fa-home"></i>
+                      Home
+                    </a>
+                  </li>
+                  <li>
+                    <a href="data_barang_admin.php">
+                      <i class="fa fa-shopping-basket"></i>
+                      Data Barang
+                    </a>
+                  </li>
+                  <li>
+                    <a href="data_pengembalian_admin.php">
+                      <i class="fa fa-table"></i>
+                      Data Pengembalian
+                    </a>
+                  </li>
+                  <li>
+                    <a href="data_user_admin.php">
+                      <i class="fa fa-user"></i>
+                      Data User
+                    </a>
+                  </li>
+                  <li>
+                    <a href="form_registrasiuser.php">
+                      <i class="fa fa-pencil"></i>
+                        Form Registrasi User
+                    </a>
+                  </li>
+                  <li>
+                    <a href="form_tambahbarang.php">
+                      <i class="fa fa-pencil"></i>
+                        Form Tambah Barang
+                    </a>
+                  </li>
+                  <li>
+                    <a href="form_pengembalian.php">
+                      <i class="fa fa-pencil"></i>
+                      Form Pengembalian
+                    </a>
+                  </li>
+                </ul>
               </div>
-              <!-- /sidebar menu -->
+            </div>
+            <!-- /sidebar menu -->
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
@@ -142,7 +149,7 @@
               <a data-toggle="tooltip" data-placement="top" title="Lock">
                 <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
               </a>
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
               </a>
             </div>
@@ -190,25 +197,51 @@
             require('../db/koneksi.php');
             session_start();
             if(isset($_POST['submit'])){
-              $kodebarang   = $conn -> real_escape_string($_POST['kodebarang']);
+              //$kodebarang   = $conn -> real_escape_string($_POST['kodebarang']);
               $namabarang   = $conn -> real_escape_string($_POST['namabarang']);
               $jenisbarang  = $conn -> real_escape_string($_POST['jenisbarang']);
               $keadaan      = $conn -> real_escape_string($_POST['keadaan']);
               $status       = $conn -> real_escape_string($_POST['status']);
-                
-              //check kodebarang has been taken or not
-              $sql = "SELECT kodeb FROM tb_barang WHERE kodeb='$kodebarang'";
-              $result = mysqli_query($conn,$sql);
-              $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-                
-              if(mysqli_num_rows($result) == 1){
-                echo "Sorry...This kode barang already exist..";
+              
+              $namabarang   = strtolower($namabarang);
+              $namabarang   = ucwords($namabarang);
+              if($jenisbarang=="E"){
+                $jb="Elektronik";
+              }else if($jenisbarang=="AT"){
+                $jb="Alat Tulis";
+              }else if($jenisbarang=="B"){
+                $jb="Berkas";
+              }else if($jenisbarang=="PO"){
+                $jb="Perlengkapan Olahraga";
+              }else if($jenisbarang=="AM"){
+                $jb="Alat Masak";
               }
-              else{
-                $query = mysqli_query($conn, "INSERT INTO tb_barang (id,kodeb, namab, jenisb, keadaanb, statusb) VALUES (null,'$kodebarang','$namabarang','$jenisbarang','$keadaan','$status')");
-                if($query){
-                  echo "Thank You! Barang are now registered.";
-                }
+
+              //membaca kode anggota terbesar berdasarkan jenis keanggotaan
+              $query = mysqli_query($conn, "SELECT max(kodeb) as maxkodeb FROM tb_barang WHERE kodeb LIKE '$jenisbarang%'");
+              $data = mysqli_fetch_array($query);
+              $kdMax = $data['maxkodeb'];
+              
+              if($data){
+                //mengambil angka atau bilangan dalam kode barang terbesar, dengan cara mengambil substring mulai dari karakter ke-2
+                //diambil 4 karakter, misal 'KS0001', akan diambil '0001' setelah substring bilangan diambil, di casting jadi integer
+                $noUrut = (int) substr($kdMax, 2, 4);
+
+                //bilangan yang diambil ini ditambah 1 untuk menentukan nomor urut berikutnya
+                $noUrut++;
+  
+                //membentuk kode barang baru
+                //perintah sprintf("%04s", $noUrut); digunakan untuk memformat string sebanyak 5 karakter
+                //misal sprintf("%05s", 12); maka akan dihasilkan '00012'
+                //misal sprintf("%05s", 1); akan dihasilkan string '00001'
+                $kodebarang = $jenisbarang . sprintf("%04s", $noUrut);
+              }else{
+                $kodebarang = $jenisbarang . sprintf("%04s", 0001);
+              }
+              
+              $querytb = mysqli_query($conn, "INSERT INTO tb_barang (id,kodeb, namab, jenisb, keadaanb, statusb) VALUES (null,'$kodebarang','$namabarang','$jb','$keadaan','$status')");
+              if($query){
+                  echo "<script> alert('Barang telah terdaftar. Terima Kasih.')</script>";
               }
               $conn->close();
             } 
@@ -226,28 +259,21 @@
                     <br />
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
                       <div class="form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="kodebarang">Kode Barang <span class="required">*</span>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="namabarang" >Nama Barang <span class="required">*</span>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" id="kodebarang" required="required" class="form-control col-md-7 col-xs-12" name="kodebarang">
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="namabarang">Nama Barang <span class="required">*</span>
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" id="namabarang" name="namabarang" required="required" class="form-control col-md-7 col-xs-12">
+                          <input type="text" id="namabarang" name="namabarang" required="required" class="form-control col-md-7 col-xs-12" >
                         </div>
                       </div>
                       <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Jenis Barang <span class="required">*</span></label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select class="form-control col-md-7 col-xs-12" required="required" name="jenisbarang">
-                            <option>Elektronik</option>
-                            <option>Alat Tulis</option>
-                            <option>Berkas</option>
-                            <option>Perlengkapan Olahraga</option>
-                            <option>Alat Masak</option>
+                            <option value="E">Elektronik</option>
+                            <option value="AT">Alat Tulis</option>
+                            <option value="B">Berkas</option>
+                            <option value="PO">Perlengkapan Olahraga</option>
+                            <option value="AM">Alat Masak</option>
                           </select>
                         </div>
                       </div>

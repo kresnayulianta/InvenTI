@@ -85,49 +85,55 @@
   
               <!-- sidebar menu -->
               <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-                <div class="menu_section">
-                  <h3>Menu</h3>
-                  <ul class="nav side-menu">
-                    <li>
-                      <a href="index_admin.php">
-                        <i class="fa fa-home"></i>
-                        Home
-                      </a>
-                    </li>
-                    <li>
-                      <a href="data_barang_admin.php">
-                        <i class="fa fa-shopping-basket"></i>
-                        Data Barang
-                      </a>
-                    </li>
-                    <li>
-                      <a href="data_user_admin.php">
-                        <i class="fa fa-user"></i>
-                        Data User
-                      </a>
-                    </li>
-                    <li>
-                      <a href="form_registrasiuser.php">
-                        <i class="fa fa-pencil"></i>
-                          Form Registrasi User
-                      </a>
-                    </li>
-                    <li>
-                      <a href="form_tambahbarang.php">
-                        <i class="fa fa-pencil"></i>
-                          Form Tambah Barang
-                      </a>
-                    </li>
-                    <li>
-                      <a href="form_pengembalian.php">
-                        <i class="fa fa-pencil"></i>
-                        Form Pengembalian
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+              <div class="menu_section">
+                <h3>Menu</h3>
+                <ul class="nav side-menu">
+                  <li>
+                    <a href="index_admin.php">
+                      <i class="fa fa-home"></i>
+                      Home
+                    </a>
+                  </li>
+                  <li>
+                    <a href="data_barang_admin.php">
+                      <i class="fa fa-shopping-basket"></i>
+                      Data Barang
+                    </a>
+                  </li>
+                  <li>
+                    <a href="data_pengembalian_admin.php">
+                      <i class="fa fa-table"></i>
+                      Data Pengembalian
+                    </a>
+                  </li>
+                  <li>
+                    <a href="data_user_admin.php">
+                      <i class="fa fa-user"></i>
+                      Data User
+                    </a>
+                  </li>
+                  <li>
+                    <a href="form_registrasiuser.php">
+                      <i class="fa fa-pencil"></i>
+                        Form Registrasi User
+                    </a>
+                  </li>
+                  <li>
+                    <a href="form_tambahbarang.php">
+                      <i class="fa fa-pencil"></i>
+                        Form Tambah Barang
+                    </a>
+                  </li>
+                  <li>
+                    <a href="form_pengembalian.php">
+                      <i class="fa fa-pencil"></i>
+                      Form Pengembalian
+                    </a>
+                  </li>
+                </ul>
               </div>
-              <!-- /sidebar menu -->
+            </div>
+            <!-- /sidebar menu -->
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
@@ -140,7 +146,7 @@
               <a data-toggle="tooltip" data-placement="top" title="Lock">
                 <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
               </a>
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
               </a>
             </div>
@@ -185,14 +191,6 @@
         <!-- page content -->
         <div class="right_col" role="main">
           <div class="">
-            <div class="page-title">
-              <div class="title_left">
-                <h3>Data Users <small>
-              </div>
-            </div>
-
-            <div class="clearfix"></div>
-
             <div class="row">
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
@@ -201,7 +199,7 @@
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
-                    <table id="datatable-buttons" class="table table-striped table-bordered">
+                    <table id="datatable-buttons" class="table table-striped table-bordered" method="post">
                       <thead>
                         <tr>
                           <th>No</th>
@@ -210,14 +208,15 @@
                           <th>Username</th>
                           <th>NIM</th>
                           <th>No Telp</th>
-                          <th>Hak akses</th>                          
+                          <th>Hak akses</th>
+                          <th>Konfirmasi</th>                    
                         </tr>
                       </thead>
                       <tbody>
                         <?php
                           include '../db/koneksi.php';
                           $count=1;
-                          $querytable = mysqli_query($conn, "SELECT firstname,lastname,username,nim,notelp,hakakses FROM tb_user");
+                          $querytable = mysqli_query($conn, "SELECT id,firstname,lastname,username,nim,notelp,hakakses,konfirmasi FROM tb_user");
                           while($row = mysqli_fetch_assoc($querytable))
                           { ?>
                         <tr>
@@ -227,14 +226,62 @@
                           <td><?php echo $row['username']; ?></td> 
                           <td><?php echo $row['nim']; ?></td>
                           <td><?php echo $row['notelp']; ?></td>
-                          <td><?php echo $row['hakakses']; ?></td>                        
+                          <td><?php echo $row['hakakses']; ?></td>
+                          <td>
+                            <?php
+                              if($row['konfirmasi']==0){
+                                ?>
+                                  <a class="btn btn-primary btn-xs" data-toggle="modal" data-target="#bkonfirmasi" data-href="konfirmasi_user.php?username=<?php echo $row['username'] ;?>">Ya</a>
+                                  <a class="btn btn-danger btn-xs" data-toggle="modal" data-target="#hapus" data-href="hapus_user.php?username=<?php echo $row['username'] ;?>">Hapus</a>
+                                <?php
+                              }else{
+                                ?>
+                                  <button type="button" class="btn btn-success btn-xs">Terkonfirmasi </button>
+                                <?php
+                              }
+                            ?>
+                          </td>
                         </tr>
                         <?php $count++; } ?>
                       </tbody>
                     </table>
                   </div>
                 </div>
+
+                <div id="bkonfirmasi" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Konfirmasi</h4>
+                      </div>
+                      <div class="modal-body">
+                        <p>Anda Yakin untuk mengkonfirmasi akun ?</p>
+                          <a type="button" class="btn btn-info">Ya</a>
+                          <button type="button" class="btn btn-warning" data-dismiss="modal">Tidak</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
+                <div id="hapus" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Konfirmasi</h4>
+                      </div>
+                      <div class="modal-body">
+                        <p>Anda Yakin untuk menghapus akun ?</p>
+                          <a type="button" class="btn btn-primary">Ya</a>
+                          <button type="button" class="btn btn-danger" data-dismiss="modal">Tidak</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>    
           </div>
@@ -281,6 +328,21 @@
 
     <!-- Custom Theme Scripts -->
     <script src="../../production/js/custom.min.js"></script>
+    
+    <script type="text/javascript">
+      //konfirmasi user
+      $(document).ready(function() {
+          $('#bkonfirmasi').on('show.bs.modal', function(e) {
+              $(this).find('.btn-info').attr('href', $(e.relatedTarget).data('href'));
+          });
+      });
 
+      //hapus user
+      $(document).ready(function() {
+          $('#hapus').on('show.bs.modal', function(e) {
+              $(this).find('.btn-primary').attr('href', $(e.relatedTarget).data('href'));
+          });
+      });
+    </script>
   </body>
 </html>

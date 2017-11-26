@@ -1,3 +1,17 @@
+<?php
+  date_default_timezone_set('Asia/Jakarta');
+  session_start();
+  error_reporting(0);
+  if (empty($_SESSION['login']['hakakses'])) {
+    echo "
+      <script>
+        'Anda Belum Login!'
+        window.location='/';
+      </script>";
+  }else if($_SESSION['login']['hakakses'] || empty($_SESSION['login']['hakakses'])){
+    header("Location: /db/auth.php");
+  }
+?>
 <script type="text/javascript">        
     function tampilkanwaktu(){         //fungsi ini akan dipanggil di bodyOnLoad dieksekusi tiap 1000ms = 1detik    
     var waktu = new Date();            //membuat object date berdasarkan waktu saat 

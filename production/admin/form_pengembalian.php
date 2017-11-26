@@ -88,49 +88,55 @@
 
             <!-- sidebar menu -->
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-              <div class="menu_section">
-                <h3>Menu</h3>
-                <ul class="nav side-menu">
-                  <li>
-                    <a href="index_admin.php">
-                      <i class="fa fa-home"></i>
-                      Home
-                    </a>
-                  </li>
-                  <li>
-                    <a href="data_barang_admin.php">
-                      <i class="fa fa-shopping-basket"></i>
-                      Data Barang
-                    </a>
-                  </li>
-                  <li>
-                    <a href="data_user_admin.php">
-                      <i class="fa fa-user"></i>
-                      Data User
-                    </a>
-                  </li>
-                  <li>
-                    <a href="form_registrasiuser.php">
-                      <i class="fa fa-pencil"></i>
-                        Form Registrasi User
-                    </a>
-                  </li>
-                  <li>
-                    <a href="form_tambahbarang.php">
-                      <i class="fa fa-pencil"></i>
-                        Form Tambah Barang
-                    </a>
-                  </li>
-                  <li>
-                    <a href="form_pengembalian.php">
-                      <i class="fa fa-pencil"></i>
-                        Form Pengembalian
-                    </a>
-                  </li>
-                </ul>
-              </div>
+            <div class="menu_section">
+              <h3>Menu</h3>
+              <ul class="nav side-menu">
+                <li>
+                  <a href="index_admin.php">
+                    <i class="fa fa-home"></i>
+                    Home
+                  </a>
+                </li>
+                <li>
+                  <a href="data_barang_admin.php">
+                    <i class="fa fa-shopping-basket"></i>
+                    Data Barang
+                  </a>
+                </li>
+                <li>
+                  <a href="data_pengembalian_admin.php">
+                    <i class="fa fa-table"></i>
+                    Data Pengembalian
+                  </a>
+                </li>
+                <li>
+                  <a href="data_user_admin.php">
+                    <i class="fa fa-user"></i>
+                    Data User
+                  </a>
+                </li>
+                <li>
+                  <a href="form_registrasiuser.php">
+                    <i class="fa fa-pencil"></i>
+                      Form Registrasi User
+                  </a>
+                </li>
+                <li>
+                  <a href="form_tambahbarang.php">
+                    <i class="fa fa-pencil"></i>
+                      Form Tambah Barang
+                  </a>
+                </li>
+                <li>
+                  <a href="form_pengembalian.php">
+                    <i class="fa fa-pencil"></i>
+                    Form Pengembalian
+                  </a>
+                </li>
+              </ul>
             </div>
-            <!-- /sidebar menu -->
+          </div>
+          <!-- /sidebar menu -->
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
@@ -162,7 +168,7 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="images/img.jpg" alt=""><?php
+                    <img src="../images/img.jpg" alt=""><?php
                     echo "$fname"." "."$lname";
                   ?>
                     <span class=" fa fa-angle-down"></span>
@@ -176,7 +182,7 @@
                       </a>
                     </li>
                     <li><a href="javascript:;">Help</a></li>
-                    <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                    <li><a href="../db/logout.php"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                   </ul>
                 </li>
               </ul>
@@ -189,28 +195,49 @@
         <div class="right_col" role="main">
           <?php
             require('../db/koneksi.php');
-            if(isset($_POST['submit'])){
-              $kodekembali= $conn -> real_escape_string($_POST['kodekembali']);
+            if(isset($_POST['submit'])){              
               $kodepinjam = $conn -> real_escape_string($_POST['kodepinjam']);
               $tglkembali = date("Y-m-d");
               $konfirmasi = "1";
               
-              //check kodekembali has been taken or not
-              $sql = "SELECT kodekembali FROM tb_kembali WHERE kodekembali='$kodekembali'";
-              $result = mysqli_query($conn,$sql);
-              $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+              //check kodebarang apakah ada atau tidak
+              $queryckp = mysqli_query($conn, "SELECT koddepinjam FROM tb_pinjam WHERE kodepinjam='$kodepinjam'");
               
-              if(mysqli_num_rows($result) == 1){
-                echo "Sorry...This Kode Barang Kembali already exist..";
-              }
-              else{
-                $query = mysqli_query($conn, "INSERT INTO tb_kembali(id, kodekembali, kodepinjam, tglkembali) VALUES (null,'$kodekembali','$kodepinjam','$tglkembali')");
-                $querykonfirmasi = mysqli_query($conn, "UPDATE tb_peminjaman SET konfirmasi='$konfirmasi' WHERE kodepinjam='$kodepinjam'");
-                if($query && $querykonfirmasi){
-                  echo "Thank You! you are now registered.";
+              if(mysqli_num_rows($queryckp) == 1){
+                $tglkk = date("Ymd");
+                //membaca kode anggota terbesar berdasarkan jenis keanggotaan
+                $querymax = mysqli_query($conn, "SELECT max(kodepinjam) as maxkodep FROM tb_peminjaman WHERE kodepinjam LIKE '$tglkk%'");
+                $datamax = mysqli_fetch_array($querymax);
+                $kdpMax = $datamax['maxkodep'];
+                              
+                if($datamax){
+                  //mengambil angka atau bilangan dalam kode barang terbesar, dengan cara mengambil substring mulai dari karakter ke-2
+                  //diambil 4 karakter, misal 'KS0001', akan diambil '0001' setelah substring bilangan diambil, di casting jadi integer
+                  $noUrut = (int) substr($kdpMax, 2, 4);
+                  
+                  //bilangan yang diambil ini ditambah 1 untuk menentukan nomor urut berikutnya
+                  $noUrut++;
+                  
+                  //membentuk kode barang baru
+                  //perintah sprintf("%04s", $noUrut); digunakan untuk memformat string sebanyak 5 karakter
+                  //misal sprintf("%05s", 12); maka akan dihasilkan '00012'
+                  //misal sprintf("%05s", 1); akan dihasilkan string '00001'
+                  $kodekembali = $tglkk . sprintf("%04s", $noUrut);
+                }else{
+                  $kodekembali = $tglkk . sprintf("%04s", 0001);
                 }
+                                
+                $querykembali = mysqli_query($conn, "INSERT INTO tb_kembali (id,kodekembali,kodepinjam,tglkembali) VALUES (null,'$kodekembali','$kodepinjam','$tglkembali')");
+                $querykonf = mysqli_query($conn,"UPDATE tb_peminjaman SET konfirmasi='$konfirmasi'");
+                if($querykembali && $querykonf){
+                  echo "<script> alert('Data barang kembali sudah masuk sistem. Terima Kasih.')</script>";
+                }else{
+                  echo "<script> alert('Ada yang salah. Terima Kasih.')</script>";
+                }
+              }else{
+                echo "<script> alert('Kode Pinjam tidak ada. Terima Kasih.')</script>";
               }
-            } 
+            }
           ?>
           <div class="">
             <div class="row">
@@ -223,13 +250,6 @@
                   <div class="x_content">
                     <br />
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
-                      <div class="form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="kodekembali">Kode Pengembalian <span class="required">*</span>
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" id="kodekembali" name="kodekembali" required="required" class="form-control col-md-7 col-xs-12">
-                        </div>
-                      </div>
                       <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="kodepinjam">Kode Peminjaman <span class="required">*</span>
                         </label>

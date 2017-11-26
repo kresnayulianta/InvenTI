@@ -20,35 +20,54 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Dashboard Kahima </title>
+    <title>Dashboard Kahima</title>
 
     <!-- Bootstrap -->
-    <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
-    <link href="../vendors/nprogress/nprogress.css" rel="stylesheet">
+    <link href="../../vendors/nprogress/nprogress.css" rel="stylesheet">
     <!-- iCheck -->
-    <link href="../vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+    <link href="../../vendors/iCheck/skins/flat/green.css" rel="stylesheet">
 	
     <!-- bootstrap-progressbar -->
-    <link href="../vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <link href="../../vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
     <!-- JQVMap -->
-    <link href="../vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+    <link href="../../vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
     <!-- bootstrap-daterangepicker -->
-    <link href="../vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <link href="../../vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
-    <link href="../build/css/custom.min.css" rel="stylesheet">
+    <link href="../../production/css/custom.min.css" rel="stylesheet">
   </head>
 
   <body class="nav-md">
+    <?php
+      include '../db/koneksi.php';
+      $username = $_SESSION['login']['username'];
+      $queryindex = mysqli_query($conn, "SELECT firstname,lastname,nim FROM tb_user Where username='$username'");
+      $data = mysqli_fetch_array($queryindex);
+      $_SESSION['login']['firstname'] = $data['firstname'];
+      $_SESSION['login']['lastname']  = $data['lastname'];
+      $_SESSION['login']['nim']       = $data['nim'];
+      $fname = $_SESSION['login']['firstname'];
+      $lname = $_SESSION['login']['lastname'];
+      $nim   = $_SESSION['login']['nim'];
+      $queryjbarang = mysqli_query($conn, "SELECT * FROM tb_barang");
+      $totalbarang = mysqli_num_rows($queryjbarang);
+      $queryuser = mysqli_query($conn, "SELECT * FROM tb_user ");
+      $totaluser = mysqli_num_rows($queryuser);
+      $dateharini  = date("Y-m-d"); //tanggal sesuai tanggal pc
+      $qbarangharini = mysqli_query($conn, "SELECT * FROM tb_peminjaman WHERE tglpinjam='$dateharini'"); //query untuk mengambil data peminjaman sesuai hari
+      $tbarangharini = mysqli_num_rows($qbarangharini); //query untuk total barang yang diseleksi hari
+    ?>
     <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="index_kahima.html" class="site_title"><span>Inventaris HIMTI</span></a>
+              <a href="index_kahima.php" class="site_title"><span>Inventaris HIMTI</span></a>
             </div>
 
             <div class="clearfix"></div>
@@ -56,11 +75,13 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic">
-                <img src="images/img.jpg" alt="..." class="img-circle profile_img">
+                <img src="../images/img.jpg" alt="..." class="img-circle profile_img">
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
-                <h2>Abhimata Zuhra P</h2>
+                <h2><?php
+                    echo "$fname"." "."$lname";
+                  ?></h2>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -73,32 +94,32 @@
                 <h3>Menu</h3>
                 <ul class="nav side-menu">
                   <li>
-                    <a href="index_kahima.html">
+                    <a href="index_kahima.php">
                       <i class="fa fa-home"></i>
                       Home
                     </a>
                   </li>
                   <li>
-                    <a href="laporan_barang.html">
+                    <a href="laporan_barang.php">
                       <i class="fa fa-shopping-basket"></i>
                       Laporan Barang
                     </a>
                   </li>
                   <li>
-                    <a href="laporan_peminjam.html">
-                      <i class="fa fa-user"></i>
+                    <a href="laporan_peminjam.php">
+                      <i class="fa fa-table"></i>
                       Laporan Peminjam
                     </a>
                   </li>
                   <li>
-                    <a href="laporan_pengembalian.html">
-                      <i class="fa fa-pencil"></i>
+                    <a href="laporan_pengembalian.php">
+                      <i class="fa fa-table"></i>
                         Laporan Pengembalian
                     </a>
                   </li>
                   <li>
-                    <a href="laporan_user.html">
-                      <i class="fa fa-pencil"></i>
+                    <a href="laporan_user.php">
+                      <i class="fa fa-user"></i>
                         Laporan User
                     </a>
                   </li>
@@ -118,7 +139,7 @@
               <a data-toggle="tooltip" data-placement="top" title="Lock">
                 <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
               </a>
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
               </a>
             </div>
@@ -137,7 +158,9 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="images/img.jpg" alt="">Abhimata Zuhra P
+                    <img src="../images/img.jpg" alt=""><?php
+                    echo "$fname"." "."$lname";
+                  ?>
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -149,72 +172,7 @@
                       </a>
                     </li>
                     <li><a href="javascript:;">Help</a></li>
-                    <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
-                  </ul>
-                </li>
-
-                <li role="presentation" class="dropdown">
-                  <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-                    <i class="fa fa-envelope-o"></i>
-                    <span class="badge bg-green">6</span>
-                  </a>
-                  <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
-                    <li>
-                      <a>
-                        <span class="image"><img src="images/img.jpg" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    <li>
-                      <a>
-                        <span class="image"><img src="images/img.jpg" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    <li>
-                      <a>
-                        <span class="image"><img src="images/img.jpg" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    <li>
-                      <a>
-                        <span class="image"><img src="images/img.jpg" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    <li>
-                      <div class="text-center">
-                        <a>
-                          <strong>See All Alerts</strong>
-                          <i class="fa fa-angle-right"></i>
-                        </a>
-                      </div>
-                    </li>
+                    <li><a href="../db/logout.php"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                   </ul>
                 </li>
               </ul>
@@ -238,15 +196,15 @@
             <div class="row tile_count">
               <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
                 <span class="count_top"><i class="fa fa-shopping-basket"></i> Jumlah Barang</span>
-                <div class="count">100</div>
+                <div class="count"><?php echo "$totalbarang"?></div>
               </div>
               <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
                 <span class="count_top"><i class="fa fa-user"></i> Jumlah User</span>
-                <div class="count">150</div>
+                <div class="count"><?php echo "$totaluser"?></div>
               </div>
               <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                <span class="count_top"><i class="fa fa-user"></i> Total Pinjaman Hari Ini</span>
-                <div class="count green">5</div>  
+                <span class="count_top"><i class="fa fa-calendar"></i> Total Pinjaman Hari Ini</span>
+                <div class="count"><?php echo "$tbarangharini"?></div>  
               </div>
             </div>
             
@@ -256,7 +214,9 @@
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                   <div class="x_title">
-                    <h2>Selamat Datang Kahima</h2>
+                    <h2>Selamat Datang Kahima <?php
+                    echo "$fname"." "."$lname";
+                  ?></h2>
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
@@ -281,45 +241,45 @@
     </div>
 
     <!-- jQuery -->
-    <script src="../vendors/jquery/dist/jquery.min.js"></script>
+    <script src="../../vendors/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
-    <script src="../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="../../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- FastClick -->
-    <script src="../vendors/fastclick/lib/fastclick.js"></script>
+    <script src="../../vendors/fastclick/lib/fastclick.js"></script>
     <!-- NProgress -->
-    <script src="../vendors/nprogress/nprogress.js"></script>
+    <script src="../../vendors/nprogress/nprogress.js"></script>
     <!-- Chart.js -->
-    <script src="../vendors/Chart.js/dist/Chart.min.js"></script>
+    <script src="../../vendors/Chart.js/dist/Chart.min.js"></script>
     <!-- gauge.js -->
-    <script src="../vendors/gauge.js/dist/gauge.min.js"></script>
+    <script src="../../vendors/gauge.js/dist/gauge.min.js"></script>
     <!-- bootstrap-progressbar -->
-    <script src="../vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <script src="../../vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
     <!-- iCheck -->
-    <script src="../vendors/iCheck/icheck.min.js"></script>
+    <script src="../../vendors/iCheck/icheck.min.js"></script>
     <!-- Skycons -->
-    <script src="../vendors/skycons/skycons.js"></script>
+    <script src="../../vendors/skycons/skycons.js"></script>
     <!-- Flot -->
-    <script src="../vendors/Flot/jquery.flot.js"></script>
-    <script src="../vendors/Flot/jquery.flot.pie.js"></script>
-    <script src="../vendors/Flot/jquery.flot.time.js"></script>
-    <script src="../vendors/Flot/jquery.flot.stack.js"></script>
-    <script src="../vendors/Flot/jquery.flot.resize.js"></script>
+    <script src="../../vendors/Flot/jquery.flot.js"></script>
+    <script src="../../vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="../../vendors/Flot/jquery.flot.time.js"></script>
+    <script src="../../vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="../../vendors/Flot/jquery.flot.resize.js"></script>
     <!-- Flot plugins -->
-    <script src="../vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
-    <script src="../vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
-    <script src="../vendors/flot.curvedlines/curvedLines.js"></script>
+    <script src="../../vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="../../vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="../../vendors/flot.curvedlines/curvedLines.js"></script>
     <!-- DateJS -->
-    <script src="../vendors/DateJS/build/date.js"></script>
+    <script src="../../vendors/DateJS/build/date.js"></script>
     <!-- JQVMap -->
-    <script src="../vendors/jqvmap/dist/jquery.vmap.js"></script>
-    <script src="../vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
-    <script src="../vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+    <script src="../../vendors/jqvmap/dist/jquery.vmap.js"></script>
+    <script src="../../vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+    <script src="../../vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
     <!-- bootstrap-daterangepicker -->
-    <script src="../vendors/moment/min/moment.min.js"></script>
-    <script src="../vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="../../vendors/moment/min/moment.min.js"></script>
+    <script src="../../vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
 
     <!-- Custom Theme Scripts -->
-    <script src="../build/js/custom.min.js"></script>
+    <script src="../../production/js/custom.min.js"></script>
 	
   </body>
 </html>

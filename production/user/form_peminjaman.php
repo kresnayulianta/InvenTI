@@ -181,31 +181,49 @@
             require('../db/koneksi.php');
             session_start();
             if(isset($_POST['submit'])){
-              $kodepinjam     = $conn -> real_escape_string($_POST['kodepinjam']);
               $kodebarang     = $conn -> real_escape_string($_POST['kodebarang']);
               $usernamepinjam = $username;
-              //$tglpinjam2     = $conn -> real_escape_string($_POST['tglpinjam']);
               $tanggalkembali2 = $conn -> real_escape_string($_POST['tanggalkembali']);
               
               $tglpinjam      = date('Y-m-d');
               $explodek       = explode('-',$tanggalkembali2);
               $tanggalkembali = date('Y-m-d', strtotime("$explodek[3]-$explodek[2]-$explodek[1]"));
               
-              //check kodebarang has been taken or not
-              $sql = "SELECT kodepinjam FROM tb_peminjaman WHERE kodepinjam='$kodepinjam'";
-              $result = mysqli_query($conn,$sql);
-              $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-                
-              if(mysqli_num_rows($result) == 1){
-                echo "Sorry...This kode pinjam already exist..";
-              }
-              else{
-                $query = mysqli_query($conn, "INSERT INTO tb_peminjaman (id,kodepinjam, kodebarangpinjam, namauserpinjam, tglpinjam, tglkembali) VALUES (null,'$kodepinjam','$kodebarang','$usernamepinjam','$tglpinjam','$tanggalkembali')");
+              //check kodebarang apakah ada atau tidak
+              $queryckb = mysqli_query($conn, "SELECT kodeb FROM  tb_barang WHERE kodeb='$kodebarang'");
 
-                if($query){
-                  echo "Thank You! Barang sudah bisa dipinjam.";
+              if(mysqli_num_rows($queryckb) == 1){
+                $tglkp = date("Ymd");
+                //membaca kode anggota terbesar berdasarkan jenis keanggotaan
+                $querymax = mysqli_query($conn, "SELECT max(kodepinjam) as maxkodep FROM tb_peminjaman WHERE kodepinjam LIKE '$tglkp%'");
+                $datamax = mysqli_fetch_array($querymax);
+                $kdpMax = $datamax['maxkodep'];
+                
+                if($datamax){
+                  //mengambil angka atau bilangan dalam kode barang terbesar, dengan cara mengambil substring mulai dari karakter ke-2
+                  //diambil 4 karakter, misal 'KS0001', akan diambil '0001' setelah substring bilangan diambil, di casting jadi integer
+                  $noUrut = (int) substr($kdpMax, 2, 4);
+
+                  //bilangan yang diambil ini ditambah 1 untuk menentukan nomor urut berikutnya
+                  $noUrut++;
+    
+                  //membentuk kode barang baru
+                  //perintah sprintf("%04s", $noUrut); digunakan untuk memformat string sebanyak 5 karakter
+                  //misal sprintf("%05s", 12); maka akan dihasilkan '00012'
+                  //misal sprintf("%05s", 1); akan dihasilkan string '00001'
+                  $kodebarang = $tglkp . sprintf("%04s", $noUrut);
+                }else{
+                  $kodebarang = $tglkp . sprintf("%04s", 0001);
                 }
+                  
+                $query = mysqli_query($conn, "INSERT INTO tb_peminjaman (id,kodepinjam, kodebarangpinjam, namauserpinjam, tglpinjam, tglkembali) VALUES (null,'$kodepinjam','$kodebarang','$usernamepinjam','$tglpinjam','$tanggalkembali')");
+                if($query){
+                  echo "<script> alert('Barang sudah bisa dipinjam. Terima Kasih.')</script>";
+                }
+              }else{
+                echo "<script> alert('Kode Barang tidak ada. Terima Kasih.')</script>";
               }
+              
               $conn->close();
             } 
           ?>
@@ -219,13 +237,6 @@
                   </div>
                   <div class="x_content">
                     <form id="form-pinjam" data-parsley-validate class="form-horizontal form-label-left" method="POST">
-                      <div class="form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="kodepinjam">Kode Peminjaman <span class="required">*</span>
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" id="kodepinjam"  name="kodepinjam" required="required" class="form-control col-md-7 col-xs-12">
-                        </div>
-                      </div>
                       <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="kodebarang">Kode Barang <span class="required">*</span>
                         </label>
