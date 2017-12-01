@@ -59,14 +59,15 @@
       $_SESSION['login']['nim']       = $data['nim'];
       $fname = $_SESSION['login']['firstname'];
       $lname = $_SESSION['login']['lastname'];
-      $nim   = $_SESSION['login']['nim']
+      $nim   = $_SESSION['login']['nim'];
+      $foto  = $_SESSION['login']['foto'];
     ?>
     <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="index_admin.php" class="site_title"><i class="fa fa-paw"></i> <span>Inventaris HIMTI</span></a>
+              <a href="index_admin.php" class="site_title"><span>Inventaris HIMTI</span></a>
             </div>
 
             <div class="clearfix"></div>
@@ -74,7 +75,7 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
                 <div class="profile_pic">
-                  <img src="../images/img.jpg" alt="..." class="img-circle profile_img">
+                  <img src=<?php echo "../images/".$foto ?> alt="..." class="img-circle profile_img">
                 </div>
                 <div class="profile_info">
                   <span>Welcome,</span>
@@ -141,17 +142,11 @@
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
-              <a data-toggle="tooltip" data-placement="top" title="Settings">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
-                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Lock">
-                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-              </a>
               <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="FullScreen" data-original-title="Fullscreen" onclick="toggleFull()">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
               </a>
             </div>
             <!-- /menu footer buttons -->
@@ -169,20 +164,12 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../images/img.jpg" alt=""><?php
+                    <img src=<?php echo "../images/".$foto ?> alt=""><?php
                       echo "$fname"." "."$lname";
                     ?>
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
-                    <li><a href="javascript:;"> Profile</a></li>
-                    <li>
-                      <a href="javascript:;">
-                        <span class="badge bg-red pull-right">50%</span>
-                        <span>Settings</span>
-                      </a>
-                    </li>
-                    <li><a href="javascript:;">Help</a></li>
                     <li><a href="../db/logout.php"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                   </ul>
                 </li>
@@ -195,35 +182,106 @@
         <!-- page content -->
         <div class="right_col" role="main">
           <?php
+            error_reporting(0);
             require('../db/koneksi.php');
             if(isset($_POST['submit'])){
               $firstname  = $conn -> real_escape_string($_POST['first-name']);
+              $firstname  = strtolower($firstname);
+              $firstname  = ucwords($firstname);
+              
               $lastname   = $conn -> real_escape_string($_POST['last-name']);
+              $lastname   = strtolower($lastname);
+              $lastname   = ucwords($lastname);
+
               $username   = $conn -> real_escape_string($_POST['username']);
+
               $password   = $conn -> real_escape_string($_POST['password']);
               $password   = md5($password);
+
               $nim        = $conn -> real_escape_string($_POST['nim']);
               $notelp     = $conn -> real_escape_string($_POST['notelp']);
               $hakakses   = $conn -> real_escape_string($_POST['hakakses']);
               $konfirmasi = $conn -> real_escape_string("1");
-              
-              $firstname  = strtolower($firstname);
-              $firstname  = ucwords($firstname);
-              $lastname   = strtolower($lastname);
-              $lastname   = ucwords($lastname);
-              
-              //check username has been taken or not
-              $sql = "SELECT username FROM tb_user WHERE username='$username'";
-              $result = mysqli_query($conn,$sql);
-              $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+
+              // get uploaded file name              
+              $image = $_FILES['uploadfoto']['name'];
+
+              if( empty( $image ) ) {
+                echo "<script> alert('File is empty, please select image to upload.')</script>";
+              } else if($_FILES['uploadfoto']['type'] == "application/msword") {
+                echo "<script> alert('Invalid image type, use (e.g. png, jpg, gif).')</script>";
+              } else if($_FILES['uploadfoto']['size'] > 2048) {
+                echo "<script> alert('File lebih dari 2MB')</script>";
+              } else if( $_FILES['uploadfoto']['error'] > 0 ) {
+                echo "<script> alert('Oops sorry, seems there is an error uploading your image, please try again later.')</script>";
+              } else {
+            
+                // strip file slashes in uploaded file, although it will not happen but just in case 
+                $filename = stripslashes( $_FILES['uploadfoto']['name'] );
+                $ext = end(explode( ".", $filename ));
+                $ext = strtolower( $ext );
                 
-              if(mysqli_num_rows($result) == 1){
-                echo "<script> alert('Maaf Username telah terpakai, Coba ganti yang lain. Terima Kasih.')</script>";
-              }
-              else{
-                $query = mysqli_query($conn, "INSERT INTO tb_user(id, firstname, lastname, username, password, nim, notelp, hakakses,konfirmasi) VALUES (null,'$firstname','$lastname','$username','$password','$nim','$notelp','$hakakses','$konfirmasi')");
-                if($query){
-                  echo "<script> alert('Username telah terdaftar. Terima Kasih.')</script>";
+                if(( $ext != "jpg" ) && ( $ext != "jpeg" ) && ( $ext != "png" ) && ( $ext != "gif" ) ) {
+                  echo "<script> alert('Unknown Image extension.')</script>";
+                  return false;
+                } else {
+                  // get uploaded file size
+                  $size = filesize( $_FILES['uploadfoto']['tmp_name'] );
+            
+                  // get php ini settings for max uploaded file size
+                  $max_upload = ini_get( 'upload_max_filesize' );
+                  
+                  // check if we're able to upload lessthan the max size
+                  if( $size > $max_upload ){
+                    echo "<script> alert('You have exceeded the upload file size.'error)</script>";
+                  }
+
+                  // check uploaded file extension if it is jpg or jpeg, otherwise png and if not then it goes to gif image conversion
+                  $uploaded_file = $_FILES['uploadfoto']['tmp_name'];
+                  if( $ext == "jpg" || $ext == "jpeg" )
+                    $source = imagecreatefromjpeg( $uploaded_file );
+                  else if( $ext == "png" )
+                    $source = imagecreatefrompng( $uploaded_file );
+                  else
+                    $source = imagecreatefromgif( $uploaded_file );
+            
+                  // getimagesize() function simply get the size of an image
+                  list( $width, $height) = getimagesize($uploaded_file);
+                  $ratio = $height / $width;
+            
+                  // new width 50(this is in pixel format)
+                  $nw = 128;
+                  $nh = ceil( $ratio * $nw );
+                  //$dst = imagecreatetruecolor( $nw, $nh );
+                  $dst = imagecreatetruecolor( $nw, $nw );
+        
+                  //imagecopyresampled( $dst, $source, 0, 0, 0,0, $nw, $nh, $width, $height );
+                  imagecopyresampled( $dst, $source, 0, 0, 0,0, $nw, $nw, $width, $height );
+            
+                  // rename our upload image file name, this to avoid conflict in previous upload images
+                  // to easily get our uploaded images name we added image size to the suffix
+                  $new_name = $username .".".$ext;
+            
+                  // move it to uploads dir with full quality
+                  imagejpeg( $dst, '../images/'.$new_name, 100 );
+            
+                  // I think that's it we're good to clear our created images
+                  imagedestroy( $source );
+                  imagedestroy( $dst );
+
+                  //check username has been taken or not
+                  $sql = "SELECT username FROM tb_user WHERE username='$username'";
+                  $result = mysqli_query($conn,$sql);
+                  $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+                      
+                  if(mysqli_num_rows($result) == 1){
+                      echo "<script> alert('Maaf Username telah terpakai, Coba ganti yang lain. Terima Kasih.')</script>";
+                  }else{
+                    $query = mysqli_query($conn, "INSERT INTO tb_user(id, firstname, lastname, username, password, nim, notelp, hakakses,konfirmasi,foto) VALUES (null,'$firstname','$lastname','$username','$password','$nim','$notelp','$hakakses','$konfirmasi','$new_name')");
+                    if($query){
+                      echo "<script> alert('Username telah terdaftar. Terima Kasih.')</script>";
+                    }
+                  }
                 }
               }
             } 
@@ -238,7 +296,7 @@
                   </div>
                   <div class="x_content">
                     <br />
-                    <form id="form-registuser" data-parsley-validate class="form-horizontal form-label-left" method="post">
+                    <form id="form-registuser" data-parsley-validate class="form-horizontal form-label-left" method="post" enctype="multipart/form-data">
                       <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">First Name <span class="required">*</span>
                         </label>
@@ -285,6 +343,12 @@
                             <option>Peminjam</option>
                             <option>Kahima</option>
                           </select>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="uploadfoto" class="control-label col-md-3 col-sm-3 col-xs-12">Foto <span class="required">*</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="file" class="form-control col-md-7 col-xs-12" name="uploadfoto" id="uploadfoto" required="required" >
                         </div>
                       </div>
                       <div class="ln_solid"></div>
@@ -353,6 +417,41 @@
     <script src="../../vendors/starrr/dist/starrr.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="../../production/js/custom.min.js"></script>
-    
+
+    <script>
+      function toggleFull() {
+        var elem = document.documentElement; // Make the body go full screen.
+        var isInFullScreen = (document.fullScreenElement && document.fullScreenElement !== null) ||  (document.mozFullScreen || document.webkitIsFullScreen);
+
+        if (isInFullScreen) {
+          exitFullscreen();
+        } else {
+          launchIntoFullscreen(elem);
+        }
+        return false;
+      }
+
+      function launchIntoFullscreen(element) {
+        if(element.requestFullscreen) {
+          element.requestFullscreen();
+        } else if(element.mozRequestFullScreen) {
+          element.mozRequestFullScreen();
+        } else if(element.webkitRequestFullscreen) {
+          element.webkitRequestFullscreen();
+        } else if(element.msRequestFullscreen) {
+          element.msRequestFullscreen();
+        }
+      }
+      
+      function exitFullscreen() {
+        if(document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if(document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if(document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    </script>
   </body>
 </html>

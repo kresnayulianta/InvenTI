@@ -59,6 +59,7 @@
       $fname = $_SESSION['login']['firstname'];
       $lname = $_SESSION['login']['lastname'];
       $nim   = $_SESSION['login']['nim'];
+      $foto  = $_SESSION['login']['foto'];
     ?>
     <div class="container body">
       <div class="main_container">
@@ -73,7 +74,7 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic">
-                <img src="../images/img.jpg" alt="..." class="img-circle profile_img">
+                <img src=<?php echo "../images/".$foto ?> alt="..." class="img-circle profile_img">
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
@@ -140,17 +141,11 @@
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
-              <a data-toggle="tooltip" data-placement="top" title="Settings">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
-                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Lock">
-                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-              </a>
               <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="FullScreen" data-original-title="Fullscreen" onclick="toggleFull()">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
               </a>
             </div>
             <!-- /menu footer buttons -->
@@ -168,20 +163,12 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../images/img.jpg" alt=""><?php
+                    <img src=<?php echo "../images/".$foto ?> alt=""><?php
                     echo "$fname"." "."$lname";
                   ?>
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
-                    <li><a href="javascript:;"> Profile</a></li>
-                    <li>
-                      <a href="javascript:;">
-                        <span class="badge bg-red pull-right">50%</span>
-                        <span>Settings</span>
-                      </a>
-                    </li>
-                    <li><a href="javascript:;">Help</a></li>
                     <li><a href="../db/logout.php"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                   </ul>
                 </li>
@@ -198,22 +185,28 @@
             if(isset($_POST['submit'])){              
               $kodepinjam = $conn -> real_escape_string($_POST['kodepinjam']);
               $tglkembali = date("Y-m-d");
+              $keadaan = $conn -> real_escape_string($_POST['keadaan']);
               $konfirmasi = "1";
               
-              //check kodebarang apakah ada atau tidak
-              $queryckp = mysqli_query($conn, "SELECT koddepinjam FROM tb_pinjam WHERE kodepinjam='$kodepinjam'");
+              if($keadaan == "Sangat Baik" || $keadaan == "Baik" || $keadaan == "Cukup"){
+                $statusb = "Ada";
+              } else if($keadaan == "Rusak" ||$keadaan == "Sangat Rusak"){
+                $statusb = "Tidak Ada";
+              }
+              //check kodepinjam apakah ada atau tidak
+              $queryckp = mysqli_query($conn, "SELECT kodepinjam FROM tb_peminjaman WHERE kodepinjam='$kodepinjam'");
               
               if(mysqli_num_rows($queryckp) == 1){
                 $tglkk = date("Ymd");
                 //membaca kode anggota terbesar berdasarkan jenis keanggotaan
-                $querymax = mysqli_query($conn, "SELECT max(kodepinjam) as maxkodep FROM tb_peminjaman WHERE kodepinjam LIKE '$tglkk%'");
+                $querymax = mysqli_query($conn, "SELECT max(kodekembali) as maxkodek FROM tb_kembali WHERE kodekembali LIKE '$tglkk%'");
                 $datamax = mysqli_fetch_array($querymax);
-                $kdpMax = $datamax['maxkodep'];
+                $kdkMax = $datamax['maxkodek'];
                               
                 if($datamax){
                   //mengambil angka atau bilangan dalam kode barang terbesar, dengan cara mengambil substring mulai dari karakter ke-2
                   //diambil 4 karakter, misal 'KS0001', akan diambil '0001' setelah substring bilangan diambil, di casting jadi integer
-                  $noUrut = (int) substr($kdpMax, 2, 4);
+                  $noUrut = (int) substr($kdkMax, 2, 4);
                   
                   //bilangan yang diambil ini ditambah 1 untuk menentukan nomor urut berikutnya
                   $noUrut++;
@@ -227,8 +220,9 @@
                   $kodekembali = $tglkk . sprintf("%04s", 0001);
                 }
                                 
-                $querykembali = mysqli_query($conn, "INSERT INTO tb_kembali (id,kodekembali,kodepinjam,tglkembali) VALUES (null,'$kodekembali','$kodepinjam','$tglkembali')");
+                $querykembali = mysqli_query($conn, "INSERT INTO tb_kembali (id,kodekembali,kodepinjam,kondisibarangk,tglkembali) VALUES (null,'$kodekembali','$kodepinjam','$keadaan','$tglkembali')");
                 $querykonf = mysqli_query($conn,"UPDATE tb_peminjaman SET konfirmasi='$konfirmasi'");
+                $querystatus = mysqli_query($conn,"UPDATE tb_barang SET statusb='$statusb'");
                 if($querykembali && $querykonf){
                   echo "<script> alert('Data barang kembali sudah masuk sistem. Terima Kasih.')</script>";
                 }else{
@@ -262,6 +256,18 @@
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input type="text" id="tglkembali" name="tglkembali" required="required" readonly="readonly" class="form-control col-md-7 col-xs-12" value=<?php echo date("d-m-Y");?>>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Keadaan <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <select class="form-control col-md-7 col-xs-12" required="required" name="keadaan">
+                            <option>Sangat Baik</option>
+                            <option>Baik</option>
+                            <option>Cukup</option>
+                            <option>Rusak</option>
+                            <option>Sangat Rusak</option>
+                          </select>
                         </div>
                       </div>
                       <div class="ln_solid"></div>
@@ -326,6 +332,42 @@
     <script src="../../vendors/starrr/dist/starrr.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="../../production/js/custom.min.js"></script>
+
+    <script>
+      function toggleFull() {
+        var elem = document.documentElement; // Make the body go full screen.
+        var isInFullScreen = (document.fullScreenElement && document.fullScreenElement !== null) ||  (document.mozFullScreen || document.webkitIsFullScreen);
+
+        if (isInFullScreen) {
+          exitFullscreen();
+        } else {
+          launchIntoFullscreen(elem);
+        }
+        return false;
+      }
+
+      function launchIntoFullscreen(element) {
+        if(element.requestFullscreen) {
+          element.requestFullscreen();
+        } else if(element.mozRequestFullScreen) {
+          element.mozRequestFullScreen();
+        } else if(element.webkitRequestFullscreen) {
+          element.webkitRequestFullscreen();
+        } else if(element.msRequestFullscreen) {
+          element.msRequestFullscreen();
+        }
+      }
+      
+      function exitFullscreen() {
+        if(document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if(document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if(document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    </script>
 	
   </body>
 </html>

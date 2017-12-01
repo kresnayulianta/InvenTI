@@ -54,14 +54,15 @@
       $_SESSION['login']['nim']       = $data['nim'];
       $fname = $_SESSION['login']['firstname'];
       $lname = $_SESSION['login']['lastname'];
-      $nim   = $_SESSION['login']['nim']
+      $nim   = $_SESSION['login']['nim'];
+      $foto  = $_SESSION['login']['foto'];
     ?>
     <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="index_admin.php" class="site_title"><i class="fa fa-paw"></i> <span>Inventaris HIMTI</span></a>
+              <a href="index_admin.php" class="site_title"><span>Inventaris HIMTI</span></a>
             </div>
 
             <div class="clearfix"></div>
@@ -69,7 +70,7 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
                 <div class="profile_pic">
-                  <img src="../images/img.jpg" alt="..." class="img-circle profile_img">
+                  <img src=<?php echo "../images/".$foto ?> alt="..." class="img-circle profile_img">
                 </div>
                 <div class="profile_info">
                   <span>Welcome,</span>
@@ -134,22 +135,16 @@
               </div>
               <!-- /sidebar menu -->
 
-            <!-- /menu footer buttons -->
-            <div class="sidebar-footer hidden-small">
-              <a data-toggle="tooltip" data-placement="top" title="Settings">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
-                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Lock">
-                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
-                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-              </a>
-            </div>
-            <!-- /menu footer buttons -->
+              <!-- /menu footer buttons -->
+              <div class="sidebar-footer hidden-small">
+                <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
+                  <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                </a>
+                <a data-toggle="tooltip" data-placement="top" title="FullScreen" data-original-title="Fullscreen" onclick="toggleFull()">
+                  <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+                </a>
+              </div>
+              <!-- /menu footer buttons -->
           </div>
         </div>
 
@@ -164,20 +159,12 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../images/img.jpg" alt=""><?php
+                    <img src=<?php echo "../images/".$foto ?> alt=""><?php
                       echo "$fname"." "."$lname";
                     ?>
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
-                    <li><a href="javascript:;"> Profile</a></li>
-                    <li>
-                      <a href="javascript:;">
-                        <span class="badge bg-red pull-right">50%</span>
-                        <span>Settings</span>
-                      </a>
-                    </li>
-                    <li><a href="javascript:;">Help</a></li>
                     <li><a href="../db/logout.php"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                   </ul>
                 </li>
@@ -203,50 +190,54 @@
                       <thead>
                         <tr>
                           <th>NO</th>
+                          <th>Kode Kembali</th>
                           <th>Kode Pinjam</th>
-                          <th>Kode Barang</th>
-                          <th>Nama Barang</th>
-                          <th>Username</th>
-                          <th>Tanggal Pinjam</th>                  
                           <th>Tanggal Kembali</th>
+                          <th>Kondisi Barang Kembali</th>
                           <th>Konfirmasi</th>
+                          <th>Print</th>
                         </tr>
                       </thead>
                       <tbody>
                         <?php
                           include '../db/koneksi.php';
                           $count=1;
-                          $querytable = mysqli_query($conn, "SELECT kodepinjam,kodebarangpinjam,namauserpinjam,tglpinjam,tglkembali,konfirmasi FROM tb_peminjaman");
-                          while($row = mysqli_fetch_assoc($querytable)){ ?>
+                          $querykembali = mysqli_query($conn,"SELECT kodekembali, kodepinjam, kondisibarangk, tglkembali FROM tb_kembali");
+                          
+                          while($row = mysqli_fetch_assoc($querykembali)){
+                        ?>
                             <tr>
                               <td><?php echo $count; ?></td>
+                              <td><?php echo $row['kodekembali']; ?></td>
                               <td><?php echo $row['kodepinjam']; ?></td>
-                              <td><?php echo $row['kodebarangpinjam']; ?></td>
-                              <td>
-                                  <?php
-                                    $kodebpinjam = $row['kodebarangpinjam'];
-                                    $querynamab = mysqli_query($conn, "SELECT namab FROM tb_barang WHERE kodeb='$kodebpinjam'");
-                                    $datan      = mysqli_fetch_array($querynamab);
-                                    $namab      = $datan['namab'];
-                                    echo "$namab";
-                                  ?>
-                              </td>
-                              <td><?php echo $row['namauserpinjam']; ?></td>
-                              <td><?php echo $row['tglpinjam']; ?></td>
                               <td><?php echo $row['tglkembali']; ?></td>
+                              <td><?php echo $row['kondisibarangk']; ?></td>
                               <td>
                                 <?php
-                                if($row['konfirmasi']==0){
+                                $kp = $row['kodepinjam'];
+                                $querykonf= mysqli_query($conn, "SELECT konfirmasi FROM tb_peminjaman WHERE kodepinjam='$kp'");
+                                $datak     = mysqli_fetch_array($querykonf);
+                                $konfir    = $datak['konfirmasi'];
+                                if($konfir==0){
                                     ?>
-                                    <button type="button" class="btn btn-danger btn-xs">Belum konfirmasi</button>
+                                    <button type="button" class="btn btn-danger btn-xs">Belum Kembali</button>
                                     <?php
                                 }else{
                                     ?>
-                                    <button type="button" class="btn btn-success btn-xs">Terkonfirmasi</button>
+                                    <button type="button" class="btn btn-success btn-xs">Sudah Kembali</button>
                                     <?php
                                 }
                                 ?>
-                            </td>
+                              </td>
+                              <td>
+                                <?php if($konfir==0){
+                                  ?>
+                                  <a class="btn btn-default btn-xs"> Print</a>
+                                <?php } else {
+                                  ?>
+                                  <a class="btn btn-default btn-xs" href="printkembali.php?kodekembali=<?php echo $row['kodekembali']; ?>" > Print</a>
+                                <?php } ?> 
+                              </td>
                             </tr>
                         <?php $count++; } ?>
                       </tbody>
@@ -300,5 +291,41 @@
     <!-- Custom Theme Scripts -->
     <script src="../../production/js/custom.min.js"></script>
 
+    <script>
+      function toggleFull() {
+        var elem = document.documentElement; // Make the body go full screen.
+        var isInFullScreen = (document.fullScreenElement && document.fullScreenElement !== null) ||  (document.mozFullScreen || document.webkitIsFullScreen);
+
+        if (isInFullScreen) {
+          exitFullscreen();
+        } else {
+          launchIntoFullscreen(elem);
+        }
+        return false;
+      }
+
+      function launchIntoFullscreen(element) {
+        if(element.requestFullscreen) {
+          element.requestFullscreen();
+        } else if(element.mozRequestFullScreen) {
+          element.mozRequestFullScreen();
+        } else if(element.webkitRequestFullscreen) {
+          element.webkitRequestFullscreen();
+        } else if(element.msRequestFullscreen) {
+          element.msRequestFullscreen();
+        }
+      }
+      
+      function exitFullscreen() {
+        if(document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if(document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if(document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    </script>
+    
   </body>
 </html>

@@ -53,6 +53,7 @@
       $fname = $_SESSION['login']['firstname'];
       $lname = $_SESSION['login']['lastname'];
       $nim   = $_SESSION['login']['nim'];
+      $foto  = $_SESSION['login']['foto'];
     ?>
     <div class="container body">
       <div class="main_container">
@@ -67,7 +68,7 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
                 <div class="profile_pic">
-                  <img src="../images/img.jpg" alt="..." class="img-circle profile_img">
+                  <img src=<?php echo "../images/".$foto ?> alt="..." class="img-circle profile_img">
                 </div>
                 <div class="profile_info">
                   <span>Welcome,</span>
@@ -122,17 +123,11 @@
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
-              <a data-toggle="tooltip" data-placement="top" title="Settings">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
-                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Lock">
-                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logut.php">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="FullScreen" data-original-title="Fullscreen" onclick="toggleFull()">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
               </a>
             </div>
             <!-- /menu footer buttons -->
@@ -150,20 +145,12 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../images/img.jpg" alt=""><?php
+                    <img src=<?php echo "../images/".$foto ?> alt=""><?php
                     echo "$fname"." "."$lname";
                   ?>
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
-                    <li><a href="javascript:;"> Profile</a></li>
-                    <li>
-                      <a href="javascript:;">
-                        <span class="badge bg-red pull-right">50%</span>
-                        <span>Settings</span>
-                      </a>
-                    </li>
-                    <li><a href="javascript:;">Help</a></li>
                     <li><a href="../db/logout.php"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                   </ul>
                 </li>
@@ -276,6 +263,41 @@
 
     <!-- Custom Theme Scripts -->
     <script src="../js/custom.min.js"></script>
+    
+    <script>
+      function toggleFull() {
+        var elem = document.documentElement; // Make the body go full screen.
+        var isInFullScreen = (document.fullScreenElement && document.fullScreenElement !== null) ||  (document.mozFullScreen || document.webkitIsFullScreen);
 
+        if (isInFullScreen) {
+          exitFullscreen();
+        } else {
+          launchIntoFullscreen(elem);
+        }
+        return false;
+      }
+
+      function launchIntoFullscreen(element) {
+        if(element.requestFullscreen) {
+          element.requestFullscreen();
+        } else if(element.mozRequestFullScreen) {
+          element.mozRequestFullScreen();
+        } else if(element.webkitRequestFullscreen) {
+          element.webkitRequestFullscreen();
+        } else if(element.msRequestFullscreen) {
+          element.msRequestFullscreen();
+        }
+      }
+      
+      function exitFullscreen() {
+        if(document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if(document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if(document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    </script>
   </body>
 </html>

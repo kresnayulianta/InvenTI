@@ -53,14 +53,15 @@
       $_SESSION['login']['nim']       = $data['nim'];
       $fname = $_SESSION['login']['firstname'];
       $lname = $_SESSION['login']['lastname'];
-      $nim   = $_SESSION['login']['nim']
+      $nim   = $_SESSION['login']['nim'];
+      $foto  = $_SESSION['login']['foto'];
     ?>
     <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="index_admin.php" class="site_title"><i class="fa fa-paw"></i> <span>Inventaris HIMTI</span></a>
+              <a href="index_admin.php" class="site_title"><span>Inventaris HIMTI</span></a>
             </div>
 
             <div class="clearfix"></div>
@@ -68,7 +69,7 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
                 <div class="profile_pic">
-                  <img src="../images/img.jpg" alt="..." class="img-circle profile_img">
+                  <img src=<?php echo "../images/".$foto ?> alt="..." class="img-circle profile_img">
                 </div>
                 <div class="profile_info">
                   <span>Welcome,</span>
@@ -137,17 +138,11 @@
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
-              <a data-toggle="tooltip" data-placement="top" title="Settings">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
-                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Lock">
-                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-              </a>
               <a data-toggle="tooltip" data-placement="top" title="Logout" href="../db/logout.php">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="FullScreen" data-original-title="Fullscreen" onclick="toggleFull()">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
               </a>
             </div>
             <!-- /menu footer buttons -->
@@ -165,20 +160,12 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="../images/img.jpg" alt=""><?php
+                    <img src=<?php echo "../images/".$foto ?> alt=""><?php
                     echo "$fname"." "."$lname";
                   ?>
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
-                    <li><a href="javascript:;"> Profile</a></li>
-                    <li>
-                      <a href="javascript:;">
-                        <span class="badge bg-red pull-right">50%</span>
-                        <span>Settings</span>
-                      </a>
-                    </li>
-                    <li><a href="javascript:;">Help</a></li>
                     <li><a href="../db/logout.php"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                   </ul>
                 </li>
@@ -209,14 +196,16 @@
                           <th>NIM</th>
                           <th>No Telp</th>
                           <th>Hak akses</th>
-                          <th>Konfirmasi</th>                    
+                          <th>Foto</th>
+                          <th>Konfirmasi</th>
+                          <th>Ubah Data</th>               
                         </tr>
                       </thead>
                       <tbody>
                         <?php
                           include '../db/koneksi.php';
                           $count=1;
-                          $querytable = mysqli_query($conn, "SELECT id,firstname,lastname,username,nim,notelp,hakakses,konfirmasi FROM tb_user");
+                          $querytable = mysqli_query($conn, "SELECT id,firstname,lastname,username,nim,notelp,hakakses,konfirmasi,foto FROM tb_user");
                           while($row = mysqli_fetch_assoc($querytable))
                           { ?>
                         <tr>
@@ -227,6 +216,7 @@
                           <td><?php echo $row['nim']; ?></td>
                           <td><?php echo $row['notelp']; ?></td>
                           <td><?php echo $row['hakakses']; ?></td>
+                          <td><img src=<?php echo "../images/".$row['foto']?> width='100' height='100'></td>
                           <td>
                             <?php
                               if($row['konfirmasi']==0){
@@ -241,6 +231,16 @@
                               }
                             ?>
                           </td>
+                          <td>
+                            <a
+                              class= "btn btn-default btn-xs"
+                              data-toggle= "modal"
+                              data-target = "#ubahuser"
+                              data-href= "form_updateuser.php?username=<?php echo $row['username'];?>"
+                              data-id="<?php echo $row['username'];?>">
+                              Ubah Data User
+                              </a>
+                            </td>
                         </tr>
                         <?php $count++; } ?>
                       </tbody>
@@ -265,6 +265,24 @@
                   </div>
                 </div>
 
+                <div id="ubahuser" class="modal fade" role="dialog">
+                  <div class="modal-dialog" role="document">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Ubah Data User</h4>
+                      </div>
+                      <div class="modal-body">
+                        <div class="fetched-data"></div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Keluar</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
                 <div id="hapus" class="modal fade" role="dialog">
                   <div class="modal-dialog">
                     <!-- Modal content-->
@@ -325,6 +343,8 @@
     <script src="../../vendors/jszip/dist/jszip.min.js"></script>
     <script src="../../vendors/pdfmake/build/pdfmake.min.js"></script>
     <script src="../../vendors/pdfmake/build/vfs_fonts.js"></script>
+    <!-- jquery.inputmask -->
+    <script src="../../vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
 
     <!-- Custom Theme Scripts -->
     <script src="../../production/js/custom.min.js"></script>
@@ -343,6 +363,63 @@
               $(this).find('.btn-primary').attr('href', $(e.relatedTarget).data('href'));
           });
       });
+      
+      //update data user
+      $(document).ready(function(){
+          $('#ubahuser').on('show.bs.modal', function (e) {
+              var un = $(e.relatedTarget).data('id');
+              //menggunakan fungsi ajax untuk pengambilan data
+              $.ajax({
+                  type : 'post',
+                  url : 'form_updateuser.php',
+                  data :  'username='+ un,
+                  success : function(data){
+                    $('.fetched-data').html(data);//menampilkan data ke dalam modal
+                  }
+              });
+          });
+      });
     </script>
+
+    <script>
+      function toggleFull() {
+        var elem = document.documentElement; // Make the body go full screen.
+        var isInFullScreen = (document.fullScreenElement && document.fullScreenElement !== null) ||  (document.mozFullScreen || document.webkitIsFullScreen);
+
+        if (isInFullScreen) {
+          exitFullscreen();
+        } else {
+          launchIntoFullscreen(elem);
+        }
+        return false;
+      }
+
+      function launchIntoFullscreen(element) {
+        if(element.requestFullscreen) {
+          element.requestFullscreen();
+        } else if(element.mozRequestFullScreen) {
+          element.mozRequestFullScreen();
+        } else if(element.webkitRequestFullscreen) {
+          element.webkitRequestFullscreen();
+        } else if(element.msRequestFullscreen) {
+          element.msRequestFullscreen();
+        }
+      }
+      
+      function exitFullscreen() {
+        if(document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if(document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if(document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    </script>
+
+    <script type="text/javascript">
+      
+    </script>
+    
   </body>
 </html>
